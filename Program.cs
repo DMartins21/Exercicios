@@ -1,63 +1,52 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
-using System.Security.Cryptography;
 
-namespace Exercicios
+Console.WriteLine("Enter full file path:");
+string path = Console.ReadLine();
+
+List<Employee> emp = new();
+
+using (StreamReader sr = File.OpenText(path))
 {
-    internal class Program
+    while (!sr.EndOfStream)
     {
-        static void Main(string[] args)
-        {
+        string[] lines = sr.ReadLine().Split(',');
+        string name = lines[0];
+        string email = lines[1];
+        double salary = double.Parse(lines[2], CultureInfo.InvariantCulture);
 
-            Console.WriteLine("Enter file full path");
-            string path = Console.ReadLine();
-            List<Prod> p = new();
-
-            try
-            {
-                using (StreamReader sr = File.OpenText(path))
-                {
-                    while(!sr.EndOfStream)
-                    {
-                        string[] line = sr.ReadLine().Split(',');
-                        string name = line[0];
-                        double value = double.Parse(line[1], CultureInfo.InvariantCulture);
-
-                        p.Add(new Prod(name, value));
-                    }
-
-                    var r1 = p.Average(p => p.Value);
-                    Console.WriteLine($"Average Price:{r1.ToString("F2",CultureInfo.InvariantCulture)}");
-
-                    var r2 = p.Where(p => p.Value < r1).OrderByDescending(p => p.Name);
-                    foreach(var name in r2)
-                    {
-                        Console.WriteLine(name.Name);
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"An Error occurred: {ex.Message}");
-            }
-        }
-
-        static void Print<T>(IEnumerable<T> collection)
-        {
-            foreach (var item in collection)
-            {
-                Console.WriteLine(item);
-            }
-        }
+        emp.Add(new(name, email, salary));
     }
 
-    public class Prod{
-        public string Name { get; set; }
-        public double Value { get; set; }
+    Console.WriteLine("Enter salary:");
+    double value = double.Parse(Console.ReadLine(),CultureInfo.InvariantCulture);
 
-        public Prod(string name, double value) {
-            Name = name;
-            Value = value;
-        }
+    var result = emp.Where(e => e.Salary > value).OrderBy(e => e.Name);
+
+    var r = emp.Where(e => e.Name[0] == 'M').Sum(e => e.Salary); 
+    Console.WriteLine("Email of people whose salary is more than 2000.00");
+    foreach(var item in result)
+    {
+        Console.WriteLine(item.Email);
+    }
+    Console.WriteLine($"Sum od salary of people whose name starts whith 'M':{r.ToString("F2",CultureInfo.InvariantCulture)}");
+}
+
+
+
+
+
+public class Employee
+{
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public double Salary { get; set; }
+
+    public Employee(string name, string email, double salary)
+    {
+        Name = name;
+        Email = email;
+        Salary = salary;
     }
 }
